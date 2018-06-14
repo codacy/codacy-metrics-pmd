@@ -1,4 +1,6 @@
 package codacy.metrics
+import java.io.ByteArrayOutputStream
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import java.util.Collections
 
@@ -15,7 +17,7 @@ import net.sourceforge.pmd.util.ResourceLoader
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.util.{Failure, Try}
+import scala.util.{Failure, Success, Try}
 import scala.xml.{Elem, XML}
 
 object PMD extends MetricsTool {
@@ -24,19 +26,19 @@ object PMD extends MetricsTool {
                      language: Option[Language],
                      files: Option[Set[Source.File]],
                      options: Map[MetricsConfiguration.Key, MetricsConfiguration.Value]): Try[List[FileMetrics]] = {
-
-    language match {
-      case Some(lang) if lang != Languages.Java =>
-        Failure(new Exception(s"PMD metrics only supports Java. Provided language: $lang"))
-      case _ =>
-        calculateComplexity(source.path, files)
+    for {
+      _ <- language
+        .find(_ != Languages.Java)
+        .fold[Try[Language]](Success(Languages.Java))(lang =>
+          Failure(new Exception(s"PMD metrics only supports Java. Provided language: $lang")))
+      pmdConfig <- buildConfig(source.path, files)
+      complexity <- calculateComplexity(pmdConfig, source.path)
+    } yield {
+      complexity
     }
   }
 
-  private def calculateComplexity(directory: String, files: Option[Set[Source.File]]): Try[List[FileMetrics]] = {
-
-    val pmdConfig = buildConfig(directory, files)
-
+  private def calculateComplexity(pmdConfig: PMDConfiguration, directory: String): Try[List[FileMetrics]] = Try {
     val ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(pmdConfig, new ResourceLoader())
 
     val languages = new java.util.HashSet[net.sourceforge.pmd.lang.Language]
@@ -44,16 +46,14 @@ object PMD extends MetricsTool {
 
     val applicableFiles = pmd.PMD.getApplicableFiles(pmdConfig, languages)
 
-    Try {
-      val codacyRenderer = new CodacyInMemoryRenderer()
-      val renderer: Renderer = codacyRenderer
-      val renderers = Collections.singletonList(renderer)
+    val codacyRenderer = new CodacyInMemoryRenderer()
+    val renderer: Renderer = codacyRenderer
+    val renderers = Collections.singletonList(renderer)
 
-      pmd.PMD.processFiles(pmdConfig, ruleSetFactory, applicableFiles, new RuleContext, renderers)
+    pmd.PMD.processFiles(pmdConfig, ruleSetFactory, applicableFiles, new RuleContext, renderers)
 
-      val rulesViolations = codacyRenderer.getRulesViolations.asScala
-      createFileMetrics(rulesViolations, directory)
-    }
+    val rulesViolations = codacyRenderer.getRulesViolations.asScala
+    createFileMetrics(rulesViolations, directory)
   }
 
   private def createFileMetrics(rulesViolations: mutable.Buffer[RuleViolation], srcPath: String): List[FileMetrics] = {
@@ -98,17 +98,29 @@ object PMD extends MetricsTool {
           </properties>
         </rule>
       </ruleset>
-    val config = fileForConfig(xmlConfiguration)
 
-    config.map(p => pmdConfig.setRuleSets(p.toString))
-    pmdConfig
+    val baos = new ByteArrayOutputStream()
+
+    tmpConfigfile(xmlConfiguration) match {
+      case Success(p) =>
+        pmdConfig.setRuleSets(p.toString)
+        Success(pmdConfig)
+      case Failure(e) =>
+        val errString = new String(baos.toByteArray, StandardCharsets.UTF_8)
+        val msg =
+          s"""|Failed to execute duplication: ${e.getMessage}
+              |std:
+              |$errString
+         """.stripMargin
+
+        Failure(new Exception(msg, e))
+    }
+
   }
 
-  private def fileForConfig(config: Elem) = tmpfile(config)
-
-  private def tmpfile(content: Elem, prefix: String = "ruleset", suffix: String = ".xml"): Try[Path] = {
+  private def tmpConfigfile(content: Elem): Try[Path] = {
     Try {
-      val tmpFile = Files.createTempFile(prefix, suffix)
+      val tmpFile = Files.createTempFile("ruleset", ".xml")
       XML.save(tmpFile.toAbsolutePath.toString, content, "UTF-8", xmlDecl = true, null)
       tmpFile
     }

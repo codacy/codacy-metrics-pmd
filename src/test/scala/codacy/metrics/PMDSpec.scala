@@ -2,6 +2,7 @@ package codacy.metrics
 
 import codacy.docker.api.Source
 import codacy.docker.api.metrics.{FileMetrics, LineComplexity}
+import com.codacy.api.dtos.Languages
 import org.specs2.mutable.Specification
 
 class PMDSpec extends Specification {
@@ -34,11 +35,25 @@ class PMDSpec extends Specification {
 
     "get metrics" in {
 
-      "all files within a directory" in {
-        val fileMetricsMap =
-          PMD(source = Source.Directory(targetDir), language = None, files = None, options = Map.empty)
+      "all Java files within a directory" in {
 
-        fileMetricsMap should beSuccessfulTry(containTheSameElementsAs(expectedFileMetrics))
+        "without specifying the language" in {
+          val fileMetricsMap =
+            PMD(source = Source.Directory(targetDir), language = None, files = None, options = Map.empty)
+
+          fileMetricsMap should beSuccessfulTry(containTheSameElementsAs(expectedFileMetrics))
+        }
+
+        "specifying the Java language" in {
+          val fileMetricsMap =
+            PMD(
+              source = Source.Directory(targetDir),
+              language = Some(Languages.Java),
+              files = None,
+              options = Map.empty)
+
+          fileMetricsMap should beSuccessfulTry(containTheSameElementsAs(expectedFileMetrics))
+        }
       }
 
       "specific files" in {
@@ -50,6 +65,18 @@ class PMDSpec extends Specification {
 
         fileMetricsMap should beSuccessfulTry(containTheSameElementsAs(List(likeFileExpectedMetrics)))
       }
+    }
+
+    "fail if the language isn't Java" in {
+      val rubyLang = Languages.Ruby
+      val fileMetricsMap = PMD(
+        source = Source.Directory(targetDir),
+        language = Some(rubyLang),
+        files = Some(Set(Source.File(likeFileExpectedMetrics.filename))),
+        options = Map.empty)
+
+      fileMetricsMap should beFailedTry.withThrowable[Exception](
+        s"PMD metrics only supports Java. Provided language: $rubyLang")
     }
   }
 }
