@@ -1,6 +1,4 @@
 package codacy.metrics
-import java.io.ByteArrayOutputStream
-import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 import java.util.Collections
 
@@ -27,10 +25,7 @@ object PMD extends MetricsTool {
                      files: Option[Set[Source.File]],
                      options: Map[MetricsConfiguration.Key, MetricsConfiguration.Value]): Try[List[FileMetrics]] = {
     for {
-      _ <- language
-        .find(_ != Languages.Java)
-        .fold[Try[Language]](Success(Languages.Java))(lang =>
-          Failure(new Exception(s"PMD metrics only supports Java. Provided language: $lang")))
+      _ <- validateLanguage(language)
       pmdConfig <- buildConfig(source.path, files)
       complexity <- calculateComplexity(pmdConfig, source.path)
     } yield {
@@ -98,23 +93,23 @@ object PMD extends MetricsTool {
         </rule>
       </ruleset>
 
-    val baos = new ByteArrayOutputStream()
-
     tmpConfigfile(xmlConfiguration) match {
       case Success(p) =>
         pmdConfig.setRuleSets(p.toString)
         Success(pmdConfig)
       case Failure(e) =>
-        val errString = new String(baos.toByteArray, StandardCharsets.UTF_8)
-        val msg =
-          s"""|Failed to execute duplication: ${e.getMessage}
-              |std:
-              |$errString
-         """.stripMargin
-
+        val msg = s"Failed to save configuration: ${e.getMessage}"
         Failure(new Exception(msg, e))
     }
+  }
 
+  private def validateLanguage(language: Option[Language]): Try[Option[Language]] = {
+    language match {
+      case Some(lang) if lang != Languages.Java =>
+        Failure(new Exception(s"PMD metrics only supports Java. Provided language: $lang"))
+      case l =>
+        Success(l)
+    }
   }
 
   private def tmpConfigfile(content: Elem): Try[Path] = {
