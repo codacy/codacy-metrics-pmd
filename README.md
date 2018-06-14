@@ -1,7 +1,7 @@
 # codacy-metrics-pmd
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2b20a7e36c3b4947b8bcecc458236eca)](https://www.codacy.com/app/Codacy/codacy-metrics-pmd?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=codacy/codacy-metrics-pmd&amp;utm_campaign=Badge_Grade)
-[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/bf84767dabda4586bdb8a7c434c1f568)](https://www.codacy.com/app/Codacy/codacy-metrics-pmd?utm_source=github.com&utm_medium=referral&utm_content=codacy/codacy-metrics-pmd&utm_campaign=Badge_Coverage)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/2b20a7e36c3b4947b8bcecc458236eca)](https://www.codacy.com/app/Codacy/codacy-metrics-pmd?utm_source=github.com&utm_medium=referral&utm_content=codacy/codacy-metrics-pmd&utm_campaign=Badge_Coverage)
 [![CircleCI](https://circleci.com/gh/codacy/codacy-metrics-pmd.svg?style=svg)](https://circleci.com/gh/codacy/codacy-metrics-pmd)
 [![Docker Version](https://images.microbadger.com/badges/version/codacy/codacy-metrics-pmd.svg)](https://microbadger.com/images/codacy/codacy-metrics-pmd "Get your own version badge on microbadger.com")
 
