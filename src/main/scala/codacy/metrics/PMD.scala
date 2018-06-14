@@ -41,14 +41,13 @@ object PMD extends MetricsTool {
   private def calculateComplexity(pmdConfig: PMDConfiguration, directory: String): Try[List[FileMetrics]] = Try {
     val ruleSetFactory = RulesetsFactoryUtils.getRulesetFactory(pmdConfig, new ResourceLoader())
 
-    val languages = new java.util.HashSet[net.sourceforge.pmd.lang.Language]
+    val languages = new java.util.HashSet[pmd.lang.Language]
     languages.add(new JavaLanguageModule())
 
     val applicableFiles = pmd.PMD.getApplicableFiles(pmdConfig, languages)
 
     val codacyRenderer = new CodacyInMemoryRenderer()
-    val renderer: Renderer = codacyRenderer
-    val renderers = Collections.singletonList(renderer)
+    val renderers = Collections.singletonList(codacyRenderer: Renderer)
 
     pmd.PMD.processFiles(pmdConfig, ruleSetFactory, applicableFiles, new RuleContext, renderers)
 
