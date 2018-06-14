@@ -72,6 +72,7 @@ object PMD extends MetricsTool {
       }(collection.breakOut)
   }
 
+  @SuppressWarnings(Array("NullParameter"))
   private def buildConfig(directory: String, files: Option[Set[Source.File]]) = {
     val pmdConfig = new PMDConfiguration()
 
