@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
 
   object Codacy {
-    val metricsSeed = "com.codacy" %% "codacy-metrics-scala-seed" % "0.1.197"
+    val metricsSeed = "com.codacy" %% "codacy-metrics-scala-seed" % "0.1.247"
   }
 
   private val toolVersion = scala.io.Source.fromFile(".pmd-version").mkString.trim

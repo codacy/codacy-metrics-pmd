@@ -3,10 +3,10 @@ import java.nio.file.{Files, Path, Paths}
 import java.util.Collections
 
 import better.files._
-import codacy.docker.api.metrics.{FileMetrics, LineComplexity, MetricsTool}
-import codacy.docker.api.{MetricsConfiguration, Source}
-import com.codacy.api.dtos.{Language, Languages}
 import com.codacy.docker.api.utils.FileHelper
+import com.codacy.plugins.api.languages.{Language, Languages}
+import com.codacy.plugins.api.metrics.{FileMetrics, LineComplexity, MetricsTool}
+import com.codacy.plugins.api.{Options, Source}
 import net.sourceforge.pmd
 import net.sourceforge.pmd._
 import net.sourceforge.pmd.lang.java.JavaLanguageModule
@@ -23,7 +23,7 @@ object PMD extends MetricsTool {
   override def apply(source: Source.Directory,
                      language: Option[Language],
                      files: Option[Set[Source.File]],
-                     options: Map[MetricsConfiguration.Key, MetricsConfiguration.Value]): Try[List[FileMetrics]] = {
+                     options: Map[Options.Key, Options.Value]): Try[List[FileMetrics]] = {
     for {
       _ <- validateLanguage(language)
       pmdConfig <- buildConfig(source.path, files)
