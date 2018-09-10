@@ -1,0 +1,2 @@
+
+eval("console.log(a);")
