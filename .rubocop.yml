@@ -1,4 +1,4 @@
-BasasasaAllCops:
+AllCops:
   # Include common Ruby source files.
   Include:
     - '**/*.builder'
@@ -304,10 +304,6 @@ Style/SymbolProc:
   Enabled: true
 
 Style/TrailingCommaInArguments:
-  Enabled: true
-  EnforcedStyleForMultiline: no_comma
-
-Style/TrailingCommaInLiteral:
   Enabled: true
   EnforcedStyleForMultiline: no_comma
 

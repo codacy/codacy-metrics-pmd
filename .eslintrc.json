@@ -1,4 +1,4 @@
-  "parserOptions": {
+{"parserOptions": {
     "ecmaVersion": 6,
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
@@ -21,7 +21,7 @@
   },
   "plugins": [
     "standard",
-    "prom-omgise"
+    "promise"
   ],
   "globals": {
     "document": false,
@@ -29,7 +29,6 @@
     "window": false
   },
   "rules": {
-    "acceasasasasasasssor-pairs": 2,
     "arrow-spacing": [
       2,
       {
