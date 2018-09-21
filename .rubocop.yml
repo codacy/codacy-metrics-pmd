@@ -1,4 +1,4 @@
-AllCops:
+asaAllCops:
   # Include common Ruby source files.
   Include:
     - '**/*.builder'
@@ -61,7 +61,7 @@ AllCops:
 Gemspec/OrderedDependencies:
   Enabled: true
 
-Layout/CaseIndentation:
+Laysout/CaseIndentation:
   Enabled: true
   IndentOneStep: true
 
