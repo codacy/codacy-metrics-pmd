@@ -84,3 +84,7 @@ project/plugins/project/
 ### MacOS X default files ###
 # Ignore .DS_Store folder attributes files
 .DS_Store
+
+### Metals ###
+.metals
+.bloop
