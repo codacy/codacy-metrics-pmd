@@ -44,6 +44,10 @@ dockerEntrypoint := Seq(s"/opt/docker/bin/${name.value}")
 dockerCommands := dockerCommands.value.flatMap {
   case cmd @ Cmd("WORKDIR", _) => Seq(Cmd("WORKDIR", "/src"))
   case cmd @ Cmd("ADD", _) =>
-    Seq(Cmd("RUN", s"adduser -u 2004 -D $dockerUser"), cmd, Cmd("RUN", "mv /opt/docker/docs /docs"))
+    Seq(
+      Cmd("RUN", s"adduser -u 2004 -D $dockerUser"),
+      cmd,
+      Cmd("RUN", "mv /opt/docker/docs /docs"),
+      Cmd("RUN", "apk --no-cache add bash"))
   case other => List(other)
 }
