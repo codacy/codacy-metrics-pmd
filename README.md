@@ -33,6 +33,14 @@ docker run -it -v $PWD/src/test/resources:/src codacy/codacy-metrics-pmd:latest
 ./scripts/test.sh
 ```
 
+### Integration tests using codacy-plugins-test
+Download `codacy-plugins-test` >= `0.3.0` from [Github releases](https://github.com/codacy/codacy-plugins-test/releases)
+and then run:
+```bash
+sbt "docker:publishLocal"
+codacy-plugins-test-linux metrics codacy-metrics-pmd:0.0.1-SNAPSHOT
+```
+
 ## What is Codacy
 
 [Codacy](https://www.codacy.com/) is an Automated Code Review Tool that monitors your technical debt, helps you improve your code quality, teaches best practices to your developers, and helps you save time in Code Reviews.
