@@ -25,7 +25,7 @@ ThisBuild / scalacOptions in Test ++= Seq("-Yrangepos")
 ThisBuild / scalacOptions in (Compile, console) --= Seq("-Ywarn-unused:imports", "-Xfatal-warnings")
 name := "codacy-metrics-pmd"
 libraryDependencies ++= Seq(
-  "com.codacy" %% "codacy-metrics-scala-seed" % "0.1.285",
+  "com.codacy" %% "codacy-metrics-scala-seed" % "0.2.2",
   "org.scala-lang.modules" %% "scala-xml" % "1.2.0",
   "net.sourceforge.pmd" % "pmd-core" % toolVersion.value,
   "net.sourceforge.pmd" % "pmd-java" % toolVersion.value,
