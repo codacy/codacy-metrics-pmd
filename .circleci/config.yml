@@ -1,8 +1,8 @@
 version: 2.1
 
 orbs:
-  codacy: codacy/base@0.3.14
-  codacy_plugins_test: codacy/plugins-test@0.3.0
+  codacy: codacy/base@5.2.3
+  codacy_plugins_test: codacy/plugins-test@0.15.4
 
 workflows:
   version: 2
@@ -21,7 +21,7 @@ workflows:
                  set version in Docker := \"latest\";
                  docker:publishLocal;
                  test"
-            docker save --output ~/workdir/docker-image.tar $CIRCLE_PROJECT_REPONAME:latest
+            docker save --output docker-image.tar $CIRCLE_PROJECT_REPONAME:latest
           persist_to_workspace: true
           requires:
             - codacy/checkout_and_version
@@ -32,16 +32,8 @@ workflows:
           run_pattern_tests: false
           requires:
             - publish_docker_local
-      - codacy/sbt:
-          name: publish_dockerhub
+      - codacy/publish_docker:
           context: CodacyDocker
-          cmd: |
-            docker load --input ~/workdir/docker-image.tar
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker tag $CIRCLE_PROJECT_REPONAME codacy/$CIRCLE_PROJECT_REPONAME:$(cat .version)
-            docker tag $CIRCLE_PROJECT_REPONAME codacy/$CIRCLE_PROJECT_REPONAME:latest
-            docker push codacy/$CIRCLE_PROJECT_REPONAME:$(cat .version)
-            docker push codacy/$CIRCLE_PROJECT_REPONAME:latest
           requires:
             - plugins_test
           filters:
@@ -52,4 +44,4 @@ workflows:
           name: tag_version
           context: CodacyAWS
           requires:
-            - publish_dockerhub
+            - codacy/publish_docker
