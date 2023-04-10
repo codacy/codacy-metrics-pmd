@@ -37,7 +37,7 @@ daemonUser in Docker := dockerUser
 
 daemonGroup in Docker := dockerGroup
 
-dockerBaseImage := "amazoncorretto:8-alpine3.16-jre"
+dockerBaseImage := "amazoncorretto:8-alpine3.17-jre"
 
 dockerEntrypoint := Seq(s"/opt/docker/bin/${name.value}")
 
